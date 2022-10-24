@@ -10,17 +10,18 @@ from numpy import trapz
 
 class Bcg:
 
-  #def __init__(self, path):
-    #self.path = path
-
-  #def __str__(self):
-    #return f"{self.path}"
-
   path = ""
 
   def setPath(self, elaborationPath):
     self.path = elaborationPath
 
+
+  def grafdati(self,iniziof,finef):
+    data = np.genfromtxt(self.path, delimiter=';')
+    plt.plot(data[iniziof:finef], label="Segnale di partenza BCG")
+    plt.legend()
+    plt.show()
+    return data[iniziof:finef]
     '''
     def elabora(self,cutoff):
     data = np.genfromtxt(self.path, delimiter=';')
@@ -40,21 +41,22 @@ class Bcg:
     '''
 
   def elaboration(self, inputData, cutoff):
-    normalizedData = sg.renormalize_signal(inputData[15000:15800], 50)
+    normalizedData = sg.renormalize_signal(inputData, 50)
     filteredData = cm.filter_lowpass(normalizedData, 50, cutoff)
     return filteredData, normalizedData
 
   def normalizeData(self, inputData):
-    return sg.renormalize_signal(inputData[15000:15800], 50)
+    return sg.renormalize_signal(inputData, 50)
 
   def filterlowData (self, inputData, cutoff):
     return cm.filter_lowpass(inputData, 50, cutoff)
 
   def varstdminmax (self,segnale):
-    datafrm = pd.DataFrame(data=segnale, columns=['BCG'])
-    datafrm.describe()
-    npicchi=scipy.signal.find_peaks(segnale)
-    print("Numero di picchi =", npicchi)
+    datafrm=pd.DataFrame(data=segnale, columns=['BCG'])
+    print(datafrm.describe())
+    arraypicchi=scipy.signal.find_peaks(segnale)
+    print("Posizione dei picchi =", arraypicchi)
+    return arraypicchi
 
   def area (self,segnale):
     datafrm = pd.DataFrame(data=segnale, columns=['BCG'])
@@ -99,10 +101,20 @@ class Bcg:
     return [a0 / 2.0, A, B]
 
 
-s1= Bcg('C:/Users/dario/Desktop/Hassisto/Prova2/sleeprawlive/sleeprawlive.csv')
-print("il path di elaborazione è: " + s1.path)
-dato = s1.elabora(5)
-s1.varstdminmax(dato)
-s1.area(dato)
-s1.fourier(dato)
+s1= Bcg()
+s1.setPath('C:/Users/dario/Desktop/Hassisto/Prova2/sleeprawlive/sleeprawlive.csv')
+#print("il path di elaborazione è: " + s1.path)
+datii=s1.grafdati(15000,15800)
+
+normalizzato=s1.normalizeData(datii)
+
+s1.varstdminmax(normalizzato)
+'''
+coeffs=s1.coeff(-np.pi,np.pi,3,datii)
+print('Fourier coefficients for the function wave\n')
+print('a0 ='+str(coeffs[0]))
+print('an ='+str(coeffs[1]))
+print('bn ='+str(coeffs[2]))
+print('-----------------------\n\n')
+'''
 
