@@ -100,12 +100,18 @@ class Bcg:
 
     return [a0 / 2.0, A, B]
 
+  def rolling_rms(self,x, N):
+    xc = np.cumsum(abs(x) ** 2);
+    return np.sqrt((xc[N:] - xc[:-N]) / N)
 
 s1= Bcg()
 s1.setPath('C:/Users/dario/Desktop/Hassisto/Prova2/sleeprawlive/sleeprawlive.csv')
 #print("il path di elaborazione è: " + s1.path)
 datii=s1.grafdati(15000,15800)
-
+rmsfilter=s1.rolling_rms(datii,300)
+plt.plot(rmsfilter,label="rms filter")
+plt.legend()
+plt.show()
 normalizzato=s1.normalizeData(datii)
 
 s1.varstdminmax(normalizzato)
